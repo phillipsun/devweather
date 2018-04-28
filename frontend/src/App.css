@@ -1,5 +1,10 @@
-.App {
+.App, html {
   text-align: center;
+  font-family: 'Nunito', sans-serif;
+  height: 100%;
+  min-height: 100vh;
+  background: #6297B6;
+  font-weight: 300;
 }
 
 .App-logo {
@@ -15,7 +20,51 @@
 }
 
 .App-title {
-  font-size: 1.5em;
+  font-size: 4em;
+}
+
+.App-title, h2, .searchedCity {
+  color: #FFF;
+  font-weight: 300;
+  font-size: 3rem;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.forecast-container {
+  display: flex;
+  justify-content: center;
+}
+
+.forecast-day {
+  background: #fff;
+  margin: 0 5px;
+  flex: 0 0 15%;
+  -webkit-box-shadow: 0 5px 3px #333;
+	-moz-box-shadow: 0 5px 3px #333;
+	box-shadow: 0 5px 3px #333;
+}
+
+.searched-container {
+  display: flex;
+  justify-content: center;
+}
+
+.searchedCity {
+  margin: 10px 30px;
+  
+}
+
+input, select {
+  display: block;
+  margin: 10px auto
+}
+
+button {
+  padding: 10px;
+  border-radius: 5px;
 }
 
 .App-intro {
