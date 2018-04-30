@@ -10,7 +10,6 @@ app.use( bodyParser.json() );
 app.use( express.static( __dirname + '/../frontend/build' ) );
 
 app.get('/', (req, res) => {
-    console.log(path.join(__dirname, '../frontend/build', 'index.html'))
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'))
 })
 
@@ -25,9 +24,7 @@ app.post('/api/places', (req, res) => {
         arrCopy.shift();
     }
     recentlySearchedCities = arrCopy;
-    console.log(recentlySearchedCities)
     res.status(200).send(recentlySearchedCities)
-    
 })
 
 app.listen(3000, () => {

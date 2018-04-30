@@ -1,75 +1,73 @@
 import React, { Component } from 'react';
+import axios from 'axios'
 import './App.css';
 import ForecastDay from './components/ForecastDay'
-import SearchedCity from './components/SearchedCity'
-import ForecastHeadline from './components/ForecastHeadine'
-
-import axios from 'axios'
+import RecentCity from './components/RecentCity'
 
 class App extends Component {
+
   constructor() {
     super()
 
     this.state = {
-      city: '',
+      currentCity: '',
       state: '',
       forecast: [],
       recentCitiesSearched: [],
-      cityEntered: false,
-      forecastHeadline: 'Enter City'
+      cityEntered: false
     }
 
+    this.handleChange = this.handleChange.bind(this)
     this.getForecast = this.getForecast.bind(this)
   }
 
   componentDidMount() {
+    // GET request to my API
     axios.get('/api/places')
-    .then( response => this.setState({
-      recentCitiesSearched: response.data
-    }))
-  }
-
-  getForecast() {
-    let currentCity = document.getElementById('city').value;
-    let stateList = document.getElementById('state');
-    let currentState = stateList.options[stateList.selectedIndex].value;
-
-    axios.post('/api/places', { currentCity })
-    .then( response => { 
-      console.log(response.data)
-      this.setState({
+      .then(response => 
+        this.setState({
         recentCitiesSearched: response.data
-      })
-
-    })
-    
-    axios.get(`http://api.wunderground.com/api/62ec4f1d1d3ac974/forecast10day/q/${currentState}/${currentCity}.json`)
-    .then( response => {
-      this.setState({
-        city: currentCity,
-        state: currentState,
-        forecast: response.data.forecast.simpleforecast.forecastday.slice(0, 5),
-        cityEntered: true
-      })
-      console.log(response)
-    })
-
-    
+      }))
   }
 
   handleChange(event) {
     this.setState({
-      city: event.target.value
+      currentCity: event.target.value
     })
   }
 
+  getForecast() {
+    let currentCity = document.getElementById('city-input').value;
+    let stateList = document.getElementById('state-selector');
+    let currentState = stateList.options[stateList.selectedIndex].value;
+    // POST request to my API
+    axios.post('/api/places', { currentCity })
+      .then(response =>  
+        this.setState({
+          recentCitiesSearched: response.data
+        })
+      )
+    // GET request to external API
+    axios.get(`http://api.wunderground.com/api/62ec4f1d1d3ac974/forecast10day/q/${currentState}/${currentCity}.json`)
+      .then(response => 
+        this.setState({
+          currentCity: currentCity,
+          state: currentState,
+          forecast: response.data.forecast.simpleforecast.forecastday.slice(0, 5),
+          cityEntered: true
+        })
+      )
+  }
 
   render() {
+    const isCityEntered = this.state.cityEntered;
+    const citiesSearched = this.state.recentCitiesSearched.length
+
     return (
-      <div className="App">
-        <h1 className="App-title">&lt;DevWeather/&gt;</h1>
-        <input id="city" placeholder="City" value={this.state.city} onChange={this.handleChange.bind(this)}/>
-        <select name="state" id="state">
+      <div className="devweather">
+        <h1 className="devweather-headline">&lt;DevWeather/&gt;</h1>
+        <input id="city-input" placeholder="Enter City" value={this.state.currentCity} onChange={this.handleChange}/>
+        <select name="state" id="state-selector">
           <option value="" selected="selected">Select a State</option>
           <option value="AL">Alabama</option>
           <option value="AK">Alaska</option>
@@ -123,22 +121,25 @@ class App extends Component {
           <option value="WI">Wisconsin</option>
           <option value="WY">Wyoming</option>
         </select>
-        <button onClick={() => this.getForecast()}>Get Weather Forecast</button>
 
+        <button 
+          className="get-forecast-button"
+          onClick={() => this.getForecast()}>
+            Get Weather Forecast
+        </button>
 
-        <ForecastHeadline 
-          cityEntered = {this.state.cityEntered}
-          forecastHeadline = {this.state.forecastHeadline}
-        />
+        {isCityEntered ? <h2 className="forecast-headline">5 Day Forecast</h2> : null }
+
         <ForecastDay 
           forecast={this.state.forecast}
-          cityEntered={this.state.cityEntered}
         />
 
-        <h2>Recent Searches</h2>
-        <SearchedCity 
+        {citiesSearched > 0 ? <h2 className="recent-searches-headline">Recent Searches</h2> : <h2 className="recent-searches-headline">No Recent Searches</h2>}
+
+        <RecentCity 
           recentCitiesSearched={this.state.recentCitiesSearched}
         />
+
       </div>
     );
   }
